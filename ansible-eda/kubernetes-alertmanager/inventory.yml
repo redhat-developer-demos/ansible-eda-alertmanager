@@ -1,8 +1,5 @@
-all:
+---
+ungrouped:
   hosts:
     localhost:
-      ansible_connection: local
-#  children:
-#    webservers:
-#      hosts:
-#        localhost:
+      ansible_host: 127.0.0.1

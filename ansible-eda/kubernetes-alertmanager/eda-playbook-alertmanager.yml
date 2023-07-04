@@ -1,6 +1,6 @@
 ---
 - name: Playbook reacting to AlertManager Event
-  hosts: localhost
+  hosts: all
   connection: local
   gather_facts: false
   tasks:
