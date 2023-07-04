@@ -1,0 +1,45 @@
+- name: Login
+  hosts: localhost 
+  connection: local
+  gather_facts: false
+  # environment:
+    # K8S_AUTH_HOST: "https://api.sandbox-m2.ll9k.p1.openshiftapps.com:6443" 
+    # K8S_AUTH_API_KEY: "sha256~NRG7aBVOdaRonMJ172H16KrS0Chy--knwpefomLrcZA" 
+  tasks:
+    - name: Deploy The Application
+      kubernetes.core.k8s: 
+        state: present 
+        definition: 
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            namespace: default
+            labels:
+              app.kubernetes.io/name: hello-world
+              app.kubernetes.io/version: 1.0.0-SNAPSHOT
+            name: hello-world
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app.kubernetes.io/name: hello-world
+                app.kubernetes.io/version: 1.0.0-SNAPSHOT
+            template:
+              metadata:
+                labels:
+                  app.kubernetes.io/name: hello-world
+                  app.kubernetes.io/version: 1.0.0-SNAPSHOT
+              spec:
+                containers:
+                  - env:
+                      - name: KUBERNETES_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+                    image: quay.io/lordofthejars/hello-world:1.0.0-SNAPSHOT
+                    imagePullPolicy: Always
+                    name: hello-world
+                    ports:
+                      - containerPort: 8080
+                        name: http
+                        protocol: TCP

@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.30.3
+    ports:
+      - 9000:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+
+
+#  grafana:
+#    image: grafana/grafana:8.2.2
+#    ports:
+#      - 3000:3000
+#    restart: unless-stopped
+#    volumes:
+#      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+#      - grafana-data:/var/lib/grafana
+
+  alertmanager:
+    image: prom/alertmanager:v0.23.0
+    restart: unless-stopped
+    ports:
+      - "12702:9093"
+    volumes:
+      - "./alertmanager:/config"
+      - alertmanager-data:/data
+    command: --config.file=/config/alertmanager.yml --log.level=debug 
+
+  quarkusdebugger:
+    image: quay.io/lordofthejars/alert-manager-debugger:1.0.0
+    ports:
+      - "9090:8080"
+      
+  quarkusmonitor:
+    image: quay.io/lordofthejars/quarkus-monitor:1.0.0
+    ports:
+      - "8080:8080"
+
+
+volumes:
+  prometheus-data:
+
+  grafana-data:
+
+  alertmanager-data:

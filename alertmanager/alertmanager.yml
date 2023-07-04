@@ -1,0 +1,13 @@
+route:
+  receiver: 'webhook'
+  repeat_interval: 4h
+  group_by: [ alertname ]
+
+receivers:
+
+  - name: 'webhook'
+    webhook_configs:
+      # - url: 'http://quarkusdebugger:8080/listen'
+      - url: 'http://ansibleeda:5001/endpoint'
+
+

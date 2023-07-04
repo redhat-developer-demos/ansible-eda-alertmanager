@@ -1,0 +1,9 @@
+groups:
+  - name: DemoAlerts
+    rules:
+      - alert: InstanceDown 
+        expr: up{job="services"} < 1 
+        for: 10s
+      - alert: MemoryUsage
+        expr: current_memory > 20
+        for: 10s

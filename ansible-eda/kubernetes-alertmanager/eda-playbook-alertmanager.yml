@@ -1,0 +1,12 @@
+---
+- name: Playbook reacting to AlertManager Event
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Handle new firing alert
+      when: ansible_eda.event.alert.status == "firing"
+      block:
+        - name: Debug message
+          ansible.builtin.debug:
+            msg: "The event {{ ansible_eda.event.alert.labels.alertName }} - {{ ansible_eda.event.alert.labels.alertMessage }} just triggered on {{ ansible_eda.event.alert.labels.alertTargetHosts }} to greet Ansible Event Driven! }}"
