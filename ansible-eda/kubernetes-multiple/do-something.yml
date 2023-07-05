@@ -1,0 +1,7 @@
+- hosts: all
+  connection: local
+  tasks:
+    - debug:
+        msg: "you have send the following message:"
+    - debug:
+        var: event.message
