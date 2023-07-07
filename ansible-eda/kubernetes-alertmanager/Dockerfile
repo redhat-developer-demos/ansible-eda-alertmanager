@@ -4,7 +4,6 @@ ENV JAVA_HOME="/usr/lib/jvm/jre-17"
 RUN mkdir /eda-ansible
 
 COPY inventory.yml /eda-ansible/inventory.yml
-#COPY ansible.cfg /eda-ansible/ansible.cfg
 COPY eda-rulebook-alertmanager.yml /eda-ansible/eda-rulebook-alertmanager.yml
 COPY eda-playbook-alertmanager.yml /eda-ansible/eda-playbook-alertmanager.yml
 

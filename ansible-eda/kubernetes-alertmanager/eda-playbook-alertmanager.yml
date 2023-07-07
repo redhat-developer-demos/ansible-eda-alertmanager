@@ -4,9 +4,12 @@
   connection: local
   gather_facts: false
   tasks:
-    - name: Handle new firing alert
+    - name: Scale app
       when: ansible_eda.event.alert.status == "firing"
-      block:
-        - name: Debug message
-          ansible.builtin.debug:
-            msg: "The event {{ ansible_eda.event.alert.labels.alertName }} - {{ ansible_eda.event.alert.labels.alertMessage }} just triggered on {{ ansible_eda.event.alert.labels.alertTargetHosts }} to greet Ansible Event Driven! }}"
+      kubernetes.core.k8s_scale:
+        api_version: v1
+        kind: Deployment
+        name: quarkus-monitor
+        namespace: default
+        replicas: 2
+        wait_timeout: 60

@@ -12,4 +12,4 @@ COPY alertmanager-rule.yml /eda-ansible/alertmanager-rule.yml
 WORKDIR /eda-ansible
 EXPOSE 5001 8080
 
-CMD ["ansible-rulebook", "--rulebook", "alertmanager-rule.yml", "-i", "inventory.yml", "--verbose"]
+CMD ["ansible-rulebook", "--rulebook", "alertmanager-rule.yml", "-i", "inventory.yml", "--verbose", "--print-events"]

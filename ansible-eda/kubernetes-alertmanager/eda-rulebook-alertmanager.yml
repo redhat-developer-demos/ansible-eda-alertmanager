@@ -7,6 +7,7 @@
       ansible.eda.alertmanager:
         host: 0.0.0.0
         port: 5001
+        data_host_path: ""
   
   rules:
     - name: Debug Hello event

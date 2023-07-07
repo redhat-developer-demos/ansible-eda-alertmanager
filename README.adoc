@@ -1,0 +1,56 @@
+= Ansible AlertManager
+
+This example runs Ansible EDA listening for AlertManager/Prometheus events and scaling a deployment automatically when getting out of memory.
+
+== Deploy
+
+To run this demo, first you need the Prometheus Operator installed in the `default` namespace.
+
+In the case of OpenShift, you can install it as any other operator (being in default namespace). 
+
+In the case of other Kubernetes implementations, follow https://prometheus-operator.dev/
+
+With operator and up running, deploy all the pieces.
+Go to `kubernetes` folder and run:
+
+First the application that is monitored:
+
+[source, bash]
+----
+kubectl apply -f 1-quarkus-monitor-kubernetes.yml
+----
+
+Second configure the application to be monitored:
+
+[source, bash]
+----
+kubectl apply -f 2-quarkus-monitor-servicemonitor.yaml
+----
+
+Then deploy the Ansible EDA:
+
+[source, bash]
+----
+kubectl apply -f 3-ansible-eda-debug-kubernetes.yaml
+----
+
+Finally, deploy AlertManager and Prometheus:
+
+[source, bash]
+----
+kubectl apply -f 4-alertmanager.yaml
+kubectl apply -f 5-prometheus.yaml
+----
+
+== Demo
+
+Deployments creates also an OpenShift Route to access the service outside the cluster.
+
+If you are using another Kubernetes implementation, just adapt the YAMLs to access the service.
+
+By default, there is an alarm configured but not triggered until an endpoint on `quarkus-monitor` app is called.
+
+[source, bash]
+----
+curl http://quarkus-monitor-default.apps.openshift.sotogcp.com/hello/consume/50
+----
