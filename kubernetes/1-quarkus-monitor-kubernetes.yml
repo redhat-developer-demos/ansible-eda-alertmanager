@@ -57,6 +57,7 @@ spec:
     matchLabels:
       app.kubernetes.io/version: 1.0.0
       app.kubernetes.io/name: quarkus-monitor
+      app.openshift.io/runtime: quarkus
   template:
     metadata:
       annotations:

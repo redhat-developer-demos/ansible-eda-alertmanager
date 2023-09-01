@@ -1,0 +1,98 @@
+name: Build Images using Containerfile
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      ansible-eda-base-image: ${{ steps.changes.outputs.ansible-eda-base-image }}
+      ansible-eda-alert-manager: ${{ steps.changes.outputs.ansible-eda-alert-manager }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            ansible-eda-base-image:
+              - 'ansible-eda/base-image/**'
+            ansible-eda-alert-manager:
+              - 'ansible-eda/kubernetes-alertmanager/**'
+
+  build-base-image:
+    name: Build EDA Base Image
+    runs-on: ubuntu-latest
+    needs: changes
+
+    if: ${{ (needs.changes.outputs.ansible-eda-base-image == 'true') || (github.event_name == 'workflow_dispatch') }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Buildah Action
+        uses: redhat-actions/buildah-build@v2
+        id: build-image
+        with:
+          image: ansible-eda-base
+          tags: latest ${{ github.sha }}
+          platforms: linux/amd64
+          context: ./ansible-eda/base-image
+          containerfiles: ./ansible-eda/base-image/Containerfile
+
+      - name: Echo Build Outputs
+        run: |
+          echo "Image: ${{ steps.build-image.outputs.image }}"
+          echo "Tags: ${{ steps.build-image.outputs.tags }}"
+          echo "Tagged Image: ${{ steps.build-image.outputs.image-with-tag }}"
+
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/rhdevelopers
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Print image url
+        run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
+
+  build-eda-alertmanager-image:
+    name: Build EDA Mail Image
+    runs-on: ubuntu-latest
+    needs: build-base-image
+
+    if: ${{ (needs.changes.outputs.ansible-eda-base-image == 'true') || (needs.changes.outputs.ansible-eda-alert-manager == 'true') || (github.event_name == 'workflow_dispatch') }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Buildah Action
+        uses: redhat-actions/buildah-build@v2
+        id: build-image
+        with:
+          image: k8s-ansible-eda
+          tags: alertmanager
+          platforms: linux/amd64
+          context: ./ansible-eda/kubernetes-alertmanager
+          containerfiles: ./ansible-eda/kubernetes-alertmanager/Containerfile
+
+      - name: Echo Build Outputs
+        run: |
+          echo "Image: ${{ steps.build-image.outputs.image }}"
+          echo "Tags: ${{ steps.build-image.outputs.tags }}"
+          echo "Tagged Image: ${{ steps.build-image.outputs.image-with-tag }}"
+
+      - name: Push To quay.io
+        id: push-to-quay
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: quay.io/rhdevelopers
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Print image url
+        run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"

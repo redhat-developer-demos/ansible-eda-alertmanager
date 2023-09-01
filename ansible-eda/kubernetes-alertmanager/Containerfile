@@ -1,0 +1,21 @@
+FROM quay.io/rhdevelopers/ansible-eda-base:latest
+
+RUN ansible-galaxy collection install community.general ansible.eda kubernetes.core sabre1041.eda
+
+# Set permissions to support arbitrary user IDs used by OpenShift:
+# https://docs.openshift.com/container-platform/4.13/openshift_images/create-images.html#use-uid_create-images
+# This is required to ensure permissions are set correctly on galaxy cache etc
+USER root
+RUN chown -R 1001:0 /home/ansible && chmod -R ug+rwx /home/ansible
+
+USER ansible
+
+WORKDIR /eda-ansible
+
+COPY --chown=1001:1001   inventory.yml  /eda-ansible/inventory.yml
+COPY --chown=1001:1001   rulebook.yml   /eda-ansible/rulebook.yml
+COPY --chown=1001:1001   playbook.yml   /eda-ansible/playbook.yml
+
+EXPOSE 5001
+
+CMD ansible-rulebook -i inventory.yml --rulebook rulebook.yml -i inventory -vvv
