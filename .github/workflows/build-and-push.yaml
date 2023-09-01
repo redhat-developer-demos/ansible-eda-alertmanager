@@ -18,8 +18,10 @@ jobs:
           filters: |
             ansible-eda-base-image:
               - 'ansible-eda/base-image/**'
+              - '.github/workflows/build-and-push.yaml
             ansible-eda-alert-manager:
               - 'ansible-eda/kubernetes-alertmanager/**'
+              - '.github/workflows/build-and-push.yaml
 
   build-base-image:
     name: Build EDA Base Image
@@ -64,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-base-image
 
-    if: ${{ (needs.changes.outputs.ansible-eda-base-image == 'true') || (needs.changes.outputs.ansible-eda-alert-manager == 'true') || (github.event_name == 'workflow_dispatch') }}
+    if: ${{ success() && (needs.changes.outputs.ansible-eda-base-image == 'true') || (needs.changes.outputs.ansible-eda-alert-manager == 'true') || (github.event_name == 'workflow_dispatch') }}
     steps:
       - uses: actions/checkout@v3
 
