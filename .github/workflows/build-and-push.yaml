@@ -21,7 +21,7 @@ jobs:
               - '.github/workflows/build-and-push.yaml
             ansible-eda-alert-manager:
               - 'ansible-eda/kubernetes-alertmanager/**'
-              - '.github/workflows/build-and-push.yaml
+              - '.github/workflows/build-and-push.yaml'
 
   build-base-image:
     name: Build EDA Base Image
