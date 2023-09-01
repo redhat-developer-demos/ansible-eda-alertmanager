@@ -18,4 +18,4 @@ COPY --chown=1001:1001   playbook.yml   /eda-ansible/playbook.yml
 
 EXPOSE 5001
 
-CMD ansible-rulebook -i inventory.yml --rulebook rulebook.yml -i inventory -vvv
+CMD ansible-rulebook -i inventory.yml --rulebook rulebook.yml -vvv

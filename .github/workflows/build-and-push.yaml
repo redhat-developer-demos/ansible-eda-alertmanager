@@ -60,7 +60,7 @@ jobs:
         run: echo "Image pushed to ${{ steps.push-to-quay.outputs.registry-paths }}"
 
   build-eda-alertmanager-image:
-    name: Build EDA Mail Image
+    name: Build EDA AlertManager Image
     runs-on: ubuntu-latest
     needs: build-base-image
 
