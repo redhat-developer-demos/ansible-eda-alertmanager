@@ -18,7 +18,7 @@ jobs:
           filters: |
             ansible-eda-base-image:
               - 'ansible-eda/base-image/**'
-              - '.github/workflows/build-and-push.yaml
+              - '.github/workflows/build-and-push.yaml'
             ansible-eda-alert-manager:
               - 'ansible-eda/kubernetes-alertmanager/**'
               - '.github/workflows/build-and-push.yaml'
