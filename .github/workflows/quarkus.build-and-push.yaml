@@ -31,7 +31,7 @@ jobs:
         distribution: 'adopt'
 
     - name: Build with Maven
-      run: mvn package --no-transfer-progress --file ./ansible-eda-quarkus-app/pom.xml
+      run: mvn package --no-transfer-progress --file ./quarkus-monitor/pom.xml
 
     - name: Login to quay.io
       uses: docker/login-action@v2
