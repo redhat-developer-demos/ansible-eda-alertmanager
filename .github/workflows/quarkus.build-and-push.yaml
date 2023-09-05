@@ -3,7 +3,7 @@ name: Quarkus Application Container Build
 on:
   push:
     branches: [ main ]
-    paths: ['quarkus-monitor/**']
+    paths: ['quarkus-monitor/**', '.github/workflows/quarkus.build-and-push.yaml']
   workflow_dispatch:
 
 concurrency:
