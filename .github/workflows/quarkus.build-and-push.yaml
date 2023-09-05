@@ -3,7 +3,7 @@ name: Quarkus Application Container Build
 on:
   push:
     branches: [ main ]
-    paths: ['ansible-eda-quarkus-app/**']
+    paths: ['quarkus-monitor/**']
   workflow_dispatch:
 
 concurrency:
