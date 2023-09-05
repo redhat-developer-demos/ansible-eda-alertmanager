@@ -50,6 +50,7 @@ metadata:
   labels:
     app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/name: quarkus-monitor
+    app.openshift.io/runtime: quarkus
   name: quarkus-monitor
 spec:
   replicas: 1
@@ -57,7 +58,6 @@ spec:
     matchLabels:
       app.kubernetes.io/version: 1.0.0
       app.kubernetes.io/name: quarkus-monitor
-      app.openshift.io/runtime: quarkus
   template:
     metadata:
       annotations:
@@ -76,7 +76,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-          image: quay.io/lordofthejars/quarkus-monitor:1.0.0
+          image: quay.io/rhdevelopers/ansible-eda-quarkus-app:latest
           imagePullPolicy: Always
           name: quarkus-monitor
           ports:

@@ -1,5 +1,6 @@
 package org.acme;
 
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.micrometer.core.instrument.MeterRegistry;
@@ -15,11 +16,14 @@ public class GreetingResource {
 
     private final MeterRegistry registry;
     private AtomicInteger currentMemory;
-
+    private String hostname;
 
     GreetingResource(MeterRegistry registry) {
         this.registry = registry;
         currentMemory = this.registry.gauge("current.memory", Tags.empty(), new AtomicInteger(0));
+        
+        String _hostname = System.getenv("HOSTNAME");
+        this.hostname = _hostname != null ? _hostname : "localhost";
     }
 
     @GET
@@ -28,6 +32,18 @@ public class GreetingResource {
     public Integer consume(@PathParam("amount") int mem) {
         this.currentMemory.addAndGet(mem);
         return this.currentMemory.get();
+    }
+
+    @GET
+    @Path("/consume/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public HashMap<String, Object> report() {
+        HashMap<String, Object> m = new HashMap<>();
+
+        m.put("memory", this.currentMemory.get());
+        m.put("hostname", this.hostname);
+
+        return m;
     }
 
     @GET
