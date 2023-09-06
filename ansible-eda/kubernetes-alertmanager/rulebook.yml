@@ -11,7 +11,7 @@
   
   rules:
     - name: Scale Application
-      condition: event.alert is defined
+      condition: event.meta is defined
       actions:
         - run_playbook:
             name: playbook.yml
