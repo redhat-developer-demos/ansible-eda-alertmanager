@@ -14,7 +14,7 @@ WORKDIR /eda-ansible
 
 COPY --chown=1001:1001   inventory.yml  /eda-ansible/inventory.yml
 COPY --chown=1001:1001   rulebook.yml   /eda-ansible/rulebook.yml
-COPY --chown=1001:1001   playbook.yml   /eda-ansible/playbook.yml
+COPY --chown=1001:1001   playbook*.yml  /eda-ansible/
 
 EXPOSE 5001
 
