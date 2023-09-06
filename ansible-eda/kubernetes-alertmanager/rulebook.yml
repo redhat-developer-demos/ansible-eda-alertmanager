@@ -10,10 +10,18 @@
         data_host_path: ""
   
   rules:
-    - name: Scale Application
-      condition: event.meta is defined
+    - name: Ensure minimum replica count is met
+      condition: event.alert.labels.alertname is 'InstanceDown'
       actions:
         - print_event:
             pretty: true
         - run_playbook:
-            name: playbook.yml
+            name: playbook.min-replicas.yml
+
+    - name: Scale application to meet demand
+      condition: event.alert.labels.alertname is 'MemoryUsage'
+      actions:
+        - print_event:
+            pretty: true
+        - run_playbook:
+            name: playbook.scale-replicas.yml

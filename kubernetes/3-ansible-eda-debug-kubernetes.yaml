@@ -77,6 +77,13 @@ spec:
           image: quay.io/rhdevelopers/k8s-ansible-eda:alertmanager
           imagePullPolicy: Always
           name: ansible-eda
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           ports:
             - containerPort: 5001
               name: http
