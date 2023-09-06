@@ -4,6 +4,17 @@
   connection: local
   gather_facts: false
   tasks:
+    - name: Get current deployment info
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Deployment
+        namespace: quarkus-monitor
+      register: deployment_info
+
+    - name: Print current deployment info
+      ansible.builtin.debug:
+        msg: Current deployment info {{ deployment_info | to_json }}
+
     - name: Increase replica count
       when: ansible_eda.event.alert.status == "firing"
       kubernetes.core.k8s_scale:
