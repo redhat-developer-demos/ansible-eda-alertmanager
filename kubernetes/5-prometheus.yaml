@@ -54,7 +54,7 @@ spec:
   - name: DemoAlerts
     rules:
     - alert: InstanceDown 
-      expr: up{job="services"} < 1 
+      expr: count(up{job="quarkus-monitor"}) or vector(0) < 2
       for: 10s
     - alert: MemoryUsage
       expr: current_memory > 20
