@@ -6,7 +6,7 @@ metadata:
     alertmanagerConfig: example
 spec:
   route:
-    groupBy: [alertname]
+    groupBy: [...]
     repeatInterval: 1m
     receiver: 'webhook'
   receivers:

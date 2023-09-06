@@ -52,12 +52,19 @@ metadata:
 spec:
   groups:
   - name: DemoAlerts
+    # Note: all the rules below need to include the endpoint, namespace, and job
+    # labels to ensure the EDA Pod receives the firing events. Maybe this can be
+    # configured/filtered using some filtering logic on the alertmanager YAMLs?
     rules:
     - alert: InstanceDown 
-      expr: count(up{job="quarkus-monitor"}) or vector(0) < 2
+      # If the replica count of the deployment drops below the given threshold,
+      # scale the replica count up.
+      expr: count by(job, endpoint, service, container, namespace) (up{job="quarkus-monitor"}) < 2
       for: 10s
     - alert: MemoryUsage
-      expr: current_memory > 20
+      # Sum the simulated "memory usage" from all replicas, and scale the replica
+      # count of the Deployment if it exceeds the defined threshold
+      expr: sum by (job,namespace,endpoint,service,container) (current_memory) > 40
       for: 10s
 ---
 apiVersion: monitoring.coreos.com/v1
