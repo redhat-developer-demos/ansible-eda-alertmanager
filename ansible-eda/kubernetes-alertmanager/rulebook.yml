@@ -11,7 +11,7 @@
   
   rules:
     - name: Ensure minimum replica count is met
-      condition: event.alert.labels.alertname is 'InstanceDown'
+      condition: event.alert.labels.alertname == "InstanceDown"
       actions:
         - print_event:
             pretty: true
@@ -19,7 +19,7 @@
             name: playbook.min-replicas.yml
 
     - name: Scale application to meet demand
-      condition: event.alert.labels.alertname is 'MemoryUsage'
+      condition: event.alert.labels.alertname == "MemoryUsage"
       actions:
         - print_event:
             pretty: true

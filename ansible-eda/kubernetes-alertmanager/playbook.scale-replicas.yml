@@ -1,5 +1,5 @@
 ---
-- name: Playbook reacting to AlertManager Event
+- name: Playbook reacting to AlertManager Event (MemoryUsage)
   hosts: all
   connection: local
   gather_facts: false
