@@ -13,7 +13,7 @@
     - name: Scale Application
       condition: event.meta is defined
       actions:
-        - run_playbook:
-            name: playbook.yml
         - print_event:
             pretty: true
+        - run_playbook:
+            name: playbook.yml
