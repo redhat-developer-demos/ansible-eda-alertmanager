@@ -1,3 +1,6 @@
+# This Container file provides a base EDA image that contains the necessary
+# dependencies to create Ansible EDA container images that run rulebooks
+
 FROM registry.access.redhat.com/ubi9-minimal
 
 RUN microdnf install java-17 python3 gcc python3-devel -y && microdnf clean all && python -m ensurepip --upgrade && pip3 install ansible ansible-rulebook asyncio aiokafka aiohttp aiosignal kubernetes requests ansible-runner wheel

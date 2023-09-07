@@ -1,3 +1,4 @@
+# This base image is created from the base-image/ folder in this repository
 FROM quay.io/rhdevelopers/ansible-eda-base:latest
 
 RUN ansible-galaxy collection install community.general ansible.eda kubernetes.core sabre1041.eda
