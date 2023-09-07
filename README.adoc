@@ -1,10 +1,17 @@
-= Ansible AlertManager
+= Ansible AlertManager Demo
 
 This example runs Ansible EDA within a Kubernetes/OpenShift namespace. EDA listens for AlertManager/Prometheus and scales a Deployment automatically in response to alerts.
 
 image::architecture.png[Ansible EDA Demo Architecture]
 
+The _ansible-eda/kubernetes-alertmanager/_ folder contains the https://ansible.readthedocs.io/projects/rulebook/en/stable/rulebooks.html[rulebook], https://docs.ansible.com/ansible/latest/playbook_guide/playbooks.html[playbook(s)], and a _Containerfile_ to package them into the container image that's deployed on OpenShift for this demo.
+
+The _ansible-eda/base-image/_ is used to create a base image with the necessary dependencies that _ansible-eda/kubernetes-alertmanager/_ can use to be built more quickly. 
+
 == Deploy the Demo
+
+This demo assumes you have access to an OpenShift cluster, and you can login
+as a user with the `cluster-admin` role assigned.
 
 === Prometheus Operator Install
 
