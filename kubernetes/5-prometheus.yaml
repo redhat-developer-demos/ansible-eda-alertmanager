@@ -63,7 +63,8 @@ spec:
       for: 10s
     - alert: MemoryUsage
       # Sum the simulated "memory usage" from all replicas, and scale the replica
-      # count of the Deployment if it exceeds the defined threshold
+      # count of the Deployment if it exceeds the defined threshold, e.g scaling
+      # replicas based on a backlog that can be consumed by multiple replicas
       expr: sum by (job,namespace,endpoint,service,container) (current_memory) > 40
       for: 10s
 ---

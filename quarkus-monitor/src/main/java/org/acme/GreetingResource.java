@@ -31,7 +31,7 @@ public class GreetingResource {
     }
 
     @Scheduled(every="30s")     
-    void increment() {
+    void decrement() {
         if (this.currentMemory.get() >= 1) {
             Log.info("Decrementing memory value by 1");
             this.currentMemory.decrementAndGet();
