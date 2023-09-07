@@ -1,33 +1,36 @@
 = Ansible AlertManager
 
-This example runs Ansible EDA listening for AlertManager/Prometheus events and scaling a deployment automatically when getting out of memory.
+This example runs Ansible EDA within a Kubernetes/OpenShift namespace. EDA listens for AlertManager/Prometheus and scales a Deployment automatically in response to alerts.
 
-== Deploy
+image::architecture.png[Ansible EDA Demo Architecture]
+
+== Deploy the Demo
+
+=== Prometheus Operator Install
 
 To run this demo, first you need the Prometheus Operator installed in the `default` namespace.
 
-In the case of OpenShift, you can install it as any other operator (being in default namespace). 
+In the case of OpenShift, you can install Prometheus into the `default` namespace using *Operator Hub* and searching for "prometheus" and choosing the Red Hat supported version of the Operator. If your cluster has https://docs.openshift.com/container-platform/4.12/monitoring/enabling-monitoring-for-user-defined-projects.html[monitoring enabled for user-defined projects] this step might be unnecessary.
 
-In the case of other Kubernetes implementations, follow https://prometheus-operator.dev/
+=== Deploying the Demo Components
 
-With operator and up running, deploy all the pieces.
-Go to `kubernetes` folder and run:
+With operator and up running, deploy all the pieces. Run the following commands from the _kubernetes/_ folder:
 
-First the application that is monitored:
+First deploy the Quarkus application that exposes metrics, and is monitored by Prometheus:
 
 [source, bash]
 ----
 kubectl apply -f 1-quarkus-monitor-kubernetes.yml
 ----
 
-Second configure the application to be monitored:
+Second configure the application to be monitored using a https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/getting-started.md[`ServiceMonitor`]:
 
 [source, bash]
 ----
 kubectl apply -f 2-quarkus-monitor-servicemonitor.yaml
 ----
 
-Then deploy the Ansible EDA:
+Create a Deployment that runs an Ansible EDA Pod:
 
 [source, bash]
 ----
@@ -42,15 +45,53 @@ kubectl apply -f 4-alertmanager.yaml
 kubectl apply -f 5-prometheus.yaml
 ----
 
-== Demo
+== Viewing the EDA Pod Logs
 
-Deployments creates also an OpenShift Route to access the service outside the cluster.
+The next section of the README explains how to trigger the alerts.
 
-If you are using another Kubernetes implementation, just adapt the YAMLs to access the service.
-
-By default, there is an alarm configured but not triggered until an endpoint on `quarkus-monitor` app is called.
+Before triggering the alerts, make sure to follow the Ansible EDA logs. Use the
+following commands to view EDA Pod logs:
 
 [source, bash]
 ----
-curl http://quarkus-monitor-default.apps.openshift.sotogcp.com/hello/consume/50
+export EDA_POD=$(oc get pod -l 'app.kubernetes.io/name=ansible-eda' -n default -o jsonpath='{.items[0].metadata.name}')
+
+oc logs $EDA_POD -n default -f
 ----
+
+== Demo Flow
+
+Two alerts are configured by default using a `PrometheusRule` CR in _5-prometheus.yaml_:
+
+* `InstanceDown` - This alert will fire when the number of replicas of the Quarkus application is too low.
+* `MemoryUsage` - This alert will fire when the custom `current_memory` metric exposed by the Quarkus application exceeds the defined threshold.
+
+You can view these alerts in the Prometheus UI. Obtain the Prometheus Route details to visit the UI:
+
+[source, bash]
+----
+oc get route prometheus -n default -o jsonpath='{.spec.host}'
+----
+
+Visit the hostname provided by the previous command in your browser. It should look similar to this:
+
+image::prometheus-alerts.png[Prometheus Alerts]
+
+The `InstanceDown` alert can be triggered by scaling the Quarkus deployment down to a single replica:
+
+[source, bash]
+----
+oc scale --replicas=1 deployment/quarkus-monitor -n default
+----
+
+The `MemoryUsage` alert can be triggered by making sure the sum of the `current_memory` metric reported by the Quarkus Pods exceeds the threshold defined in _5-prometheus.yaml_ for more than two minutes. Increase the `current_memory` value 
+
+[source, bash]
+----
+export QUARKUS_ROUTE=$(oc get route quarkus-monitor -n default -o jsonpath='http://{.spec.host}')
+
+curl $QUARKUS_ROUTE/hello/consume/50
+----
+
+Each Pod of the Quarkus application will lower it's `current_memory` value by 1 every 30 seconds, so eventually the alert will stop firing.
+

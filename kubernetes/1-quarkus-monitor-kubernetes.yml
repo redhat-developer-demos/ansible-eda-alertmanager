@@ -53,7 +53,7 @@ metadata:
     app.openshift.io/runtime: quarkus
   name: quarkus-monitor
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app.kubernetes.io/version: 1.0.0
