@@ -67,9 +67,7 @@ spec:
       containers:
         - env:
             - name: KUBERNETES_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
+              value: {{ .Release.Namespace }}
           image: quay.io/rhdevelopers/k8s-ansible-eda:alertmanager
           imagePullPolicy: Always
           name: ansible-eda
