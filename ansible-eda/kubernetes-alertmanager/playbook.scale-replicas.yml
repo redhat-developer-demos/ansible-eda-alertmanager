@@ -9,7 +9,7 @@
         api_version: v1
         kind: Deployment
         name: quarkus-monitor
-        namespace: "lookup('ansible.builtin.env', 'NAMESPACE', default='default')"
+        namespace: "lookup('ansible.builtin.env', 'KUBERNETES_NAMESPACE', default='default')"
       register: deployment_info
 
     - name: Print current deployment info
