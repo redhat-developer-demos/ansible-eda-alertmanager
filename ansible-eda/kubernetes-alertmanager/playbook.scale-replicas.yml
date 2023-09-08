@@ -9,7 +9,7 @@
         api_version: v1
         kind: Deployment
         name: quarkus-monitor
-        namespace: default
+        namespace: "lookup('ansible.builtin.env', 'NAMESPACE', default='default')"
       register: deployment_info
 
     - name: Print current deployment info
@@ -22,6 +22,6 @@
         api_version: v1
         kind: Deployment
         name: quarkus-monitor
-        namespace: default
+        namespace: "lookup('ansible.builtin.env', 'KUBERNETES_NAMESPACE', default='default')"
         replicas: "{{ deployment_info.resources[0].spec.replicas * 2 }}"
         wait_timeout: 60
