@@ -21,35 +21,26 @@ In the case of OpenShift, you can install Prometheus into the `default` namespac
 
 === Deploying the Demo Components
 
-With operator and up running, deploy all the pieces. Run the following commands from the _kubernetes/_ folder:
-
-First deploy the Quarkus application that exposes metrics, and is monitored by Prometheus:
+With operator and up running, deploy all the pieces using https://helm.sh/[Helm].
 
 [source, bash]
 ----
-kubectl apply -f 1-quarkus-monitor-kubernetes.yml
+export TARGET_NAMESPACE=eda-demo
+
+# Create a new project (namespace)
+oc new-project $TARGET_NAMESPACE
+
+# Setup the components in your target namespace
+helm install ansible-eda-on-kubernetes ./kubernetes-helm/ --namespace $TARGET_NAMESPACE
 ----
 
-Second configure the application to be monitored using a https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/getting-started.md[`ServiceMonitor`]:
-
-[source, bash]
-----
-kubectl apply -f 2-quarkus-monitor-servicemonitor.yaml
-----
-
-Create a Deployment that runs an Ansible EDA Pod:
-
-[source, bash]
-----
-kubectl apply -f 3-ansible-eda-debug-kubernetes.yaml
-----
-
-Finally, deploy AlertManager and Prometheus:
+If you change any of the YAML in the _kubernetes-helm/_ directory, you can
+apply those changes using:
 
 [source, bash]
 ----
-kubectl apply -f 4-alertmanager.yaml
-kubectl apply -f 5-prometheus.yaml
+# Setup the components in your target namespace
+helm upgrade ansible-eda-on-kubernetes ./kubernetes-helm/ --namespace $TARGET_NAMESPACE
 ----
 
 == Viewing the EDA Pod Logs
