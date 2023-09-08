@@ -65,7 +65,7 @@ spec:
       # Sum the simulated "memory usage" from all replicas, and scale the replica
       # count of the Deployment if it exceeds the defined threshold, e.g scaling
       # replicas based on a backlog that can be consumed by multiple replicas
-      expr: sum by (job,namespace,endpoint,service,container) (current_memory) > 40
+      expr: sum by(job, namespace, endpoint, service, container) (current_memory) / sum by(job, namespace, endpoint, service, container) (up{job="quarkus-monitor"}) > 20
       for: 10s
 ---
 apiVersion: monitoring.coreos.com/v1
