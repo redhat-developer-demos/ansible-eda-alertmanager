@@ -43,6 +43,8 @@ apply those changes using:
 helm upgrade ansible-eda-on-kubernetes ./kubernetes-helm/ --namespace $TARGET_NAMESPACE
 ----
 
+You can use `helm uninstall` to remove the demo from your cluster.
+
 == Viewing the EDA Pod Logs
 
 The next section of the README explains how to trigger the alerts.
