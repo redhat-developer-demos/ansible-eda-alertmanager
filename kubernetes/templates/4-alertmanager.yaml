@@ -6,13 +6,13 @@ metadata:
     alertmanagerConfig: example
 spec:
   route:
-    groupBy: [alertname]
-    repeatInterval: 4h
+    groupBy: [...]
+    repeatInterval: 1m
     receiver: 'webhook'
   receivers:
   - name: 'webhook'
     webhookConfigs:
-    - url: 'http://ansibleeda:5001/endpoint'
+    - url: 'http://ansibleeda.{{ .Release.Namespace }}.svc.cluster.local:5001/endpoint'
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: Alertmanager
@@ -32,7 +32,7 @@ spec:
   type: NodePort
   ports:
   - name: web
-    nodePort: 30903
+    # nodePort: 30903
     port: 9093
     protocol: TCP
     targetPort: web

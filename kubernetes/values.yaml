@@ -1,0 +1,6 @@
+quarkus_monitor:
+  image: quay.io/rhdevelopers/ansible_eda-quarkus-app:latest
+  replicas: 2
+
+ansible_eda:
+  image: quay.io/rhdevelopers/k8s-ansible-eda:alertmanager

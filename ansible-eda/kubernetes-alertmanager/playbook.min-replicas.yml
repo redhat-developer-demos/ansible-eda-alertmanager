@@ -1,15 +1,15 @@
 ---
-- name: Playbook reacting to AlertManager Event
+- name: Playbook reacting to AlertManager Event (InstanceDown)
   hosts: all
   connection: local
   gather_facts: false
   tasks:
-    - name: Scale app
+    - name: Set replica count to a minimum value
       when: ansible_eda.event.alert.status == "firing"
       kubernetes.core.k8s_scale:
         api_version: v1
         kind: Deployment
         name: quarkus-monitor
-        namespace: default
+        namespace: "{{ lookup('ansible.builtin.env', 'KUBERNETES_NAMESPACE', default='default') }}"
         replicas: 2
         wait_timeout: 60

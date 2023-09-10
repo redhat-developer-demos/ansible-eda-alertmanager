@@ -3,7 +3,6 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    app.quarkus.io/build-timestamp: 2023-06-30 - 12:45:38 +0000
     prometheus.io/scrape: "true"
     prometheus.io/path: /metrics
     prometheus.io/port: "8080"
@@ -11,7 +10,6 @@ metadata:
   labels:
     app.kubernetes.io/name: quarkus-monitor
     app.kubernetes.io/version: 1.0.0
-    app.kubernetes.io/managed-by: quarkus
   name: quarkus-monitor
 spec:
   ports:
@@ -42,7 +40,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    app.quarkus.io/build-timestamp: 2023-06-30 - 12:45:38 +0000
     prometheus.io/scrape: "true"
     prometheus.io/path: /metrics
     prometheus.io/port: "8080"
@@ -50,9 +47,10 @@ metadata:
   labels:
     app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/name: quarkus-monitor
+    app.openshift.io/runtime: quarkus
   name: quarkus-monitor
 spec:
-  replicas: 1
+  replicas: {{ .Values.quarkus_monitor.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/version: 1.0.0
@@ -60,7 +58,6 @@ spec:
   template:
     metadata:
       annotations:
-        app.quarkus.io/build-timestamp: 2023-06-30 - 12:45:38 +0000
         prometheus.io/scrape: "true"
         prometheus.io/path: /metrics
         prometheus.io/port: "8080"
@@ -75,9 +72,16 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-          image: quay.io/lordofthejars/quarkus-monitor:1.0.0
+          image: {{ .Values.quarkus_monitor.image }}
           imagePullPolicy: Always
           name: quarkus-monitor
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
           ports:
             - containerPort: 8080
               name: http

@@ -1,0 +1,51 @@
+name: Quarkus Application Container Build
+
+on:
+  push:
+    branches: [ main ]
+    paths: ['quarkus-monitor/**', '.github/workflows/quarkus.build-and-push.yaml']
+  workflow_dispatch:
+
+concurrency:
+  group: quarkus-container-build
+
+jobs:
+  build-backend-container:
+    runs-on: ubuntu-20.04
+
+    outputs:
+      git-sha: ${{ steps.git-sha.outputs.sha }}
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v3
+
+    - name: Set output for Git short SHA
+      id: git-sha
+      run: echo "::set-output name=sha::$(git rev-parse --short HEAD)"
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+
+    - name: Build with Maven
+      run: mvn package --no-transfer-progress --file ./quarkus-monitor/pom.xml
+
+    - name: Login to quay.io
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.QUAY_USERNAME }}
+        password: ${{ secrets.QUAY_PASSWORD }}
+        registry: quay.io
+
+    - name: Build and push images to quay.io
+      uses: docker/build-push-action@v4
+      with:
+        context: ./quarkus-monitor
+        file: ./quarkus-monitor/src/main/docker/Dockerfile.jvm
+        push: true
+        tags: |
+          quay.io/rhdevelopers/ansible-eda-quarkus-app:latest
+          quay.io/rhdevelopers/ansible-eda-quarkus-app:sha-${{ steps.git-sha.outputs.sha }}

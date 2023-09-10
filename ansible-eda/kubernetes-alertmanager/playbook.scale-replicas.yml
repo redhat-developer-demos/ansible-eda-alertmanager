@@ -1,0 +1,27 @@
+---
+- name: Playbook reacting to AlertManager Event (MemoryUsage)
+  hosts: all
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Get current deployment info
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Deployment
+        name: quarkus-monitor
+        namespace: "{{ lookup('ansible.builtin.env', 'KUBERNETES_NAMESPACE', default='default') }}"
+      register: deployment_info
+
+    - name: Print current deployment info
+      ansible.builtin.debug:
+        msg: Current deployment info {{ deployment_info | to_json }}
+
+    - name: Increase replica count 2x
+      when: ansible_eda.event.alert.status == "firing"
+      kubernetes.core.k8s_scale:
+        api_version: v1
+        kind: Deployment
+        name: quarkus-monitor
+        namespace: "{{ lookup('ansible.builtin.env', 'KUBERNETES_NAMESPACE', default='default') }}"
+        replicas: "{{ deployment_info.resources[0].spec.replicas * 2 }}"
+        wait_timeout: 60

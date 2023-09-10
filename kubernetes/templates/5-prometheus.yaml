@@ -40,7 +40,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus
-  namespace: default
+  namespace: {{ .Release.Namespace }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
@@ -52,12 +52,20 @@ metadata:
 spec:
   groups:
   - name: DemoAlerts
+    # Note: all the rules below need to include the endpoint, namespace, and job
+    # labels to ensure the EDA Pod receives the firing events. Maybe this can be
+    # configured/filtered using some filtering logic on the alertmanager YAMLs?
     rules:
     - alert: InstanceDown 
-      expr: up{job="services"} < 1 
+      # If the replica count of the deployment drops below the given threshold,
+      # scale the replica count up.
+      expr: count by(job, endpoint, service, container, namespace) (up{job="quarkus-monitor"}) < 2
       for: 10s
     - alert: MemoryUsage
-      expr: current_memory > 20
+      # Sum the simulated "memory usage" from all replicas, and scale the replica
+      # count of the Deployment if it exceeds the defined threshold, e.g scaling
+      # replicas based on a backlog that can be consumed by multiple replicas
+      expr: sum by(job, namespace, endpoint, service, container) (current_memory) / sum by(job, namespace, endpoint, service, container) (up{job="quarkus-monitor"}) > 20
       for: 10s
 ---
 apiVersion: monitoring.coreos.com/v1
@@ -68,9 +76,9 @@ spec:
   serviceAccountName: prometheus
   alerting:
     alertmanagers:
-    - namespace: default
-      name: alertmanager-example
-      port: web
+      - name: alertmanager-example
+        namespace: {{ .Release.Namespace }}
+        port: web
   serviceMonitorSelector:
     matchLabels:
       team: backend
@@ -91,23 +99,23 @@ spec:
   type: NodePort
   ports:
   - name: web
-    nodePort: 30900
+    # nodePort: 30900
     port: 9090
     protocol: TCP
     targetPort: web
   selector:
     prometheus: prometheus
 ---
-apiVersion: route.openshift.io/v1
 kind: Route
+apiVersion: route.openshift.io/v1
 metadata:
-  labels:
-    app: quarkus-monitor
-  name: quarkus-monitor
+  name: prometheus
 spec:
-  port:
-    targetPort: 8080
   to:
     kind: Service
-    name: quarkus-monitor
-    weight: 100
+    name: prometheus
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  port:
+    targetPort: web

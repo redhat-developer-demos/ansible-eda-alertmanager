@@ -1,0 +1,27 @@
+---
+- name: Listen for events from AlertManager
+  hosts: all
+
+  sources:
+    - name: listen for alerts
+      ansible.eda.alertmanager:
+        host: 0.0.0.0
+        port: 5001
+        data_host_path: ""
+  
+  rules:
+    - name: Ensure minimum replica count is met
+      condition: event.alert.labels.alertname == "InstanceDown"
+      actions:
+        - print_event:
+            pretty: true
+        - run_playbook:
+            name: playbook.min-replicas.yml
+
+    - name: Scale application to meet demand
+      condition: event.alert.labels.alertname == "MemoryUsage"
+      actions:
+        - print_event:
+            pretty: true
+        - run_playbook:
+            name: playbook.scale-replicas.yml
