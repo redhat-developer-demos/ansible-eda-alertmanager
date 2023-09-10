@@ -68,7 +68,7 @@ spec:
         - env:
             - name: KUBERNETES_NAMESPACE
               value: {{ .Release.Namespace }}
-          image: quay.io/rhdevelopers/k8s-ansible-eda:alertmanager
+          image: {{ .Values.ansible_eda.image }}
           imagePullPolicy: Always
           name: ansible-eda
           resources:
