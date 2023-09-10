@@ -15,9 +15,9 @@ as a user with the `cluster-admin` role assigned.
 
 === Prometheus Operator Install
 
-To run this demo, first you need the Prometheus Operator installed in the `default` namespace.
+To run this demo, first you need the Prometheus Operator installed in your target namespace.
 
-In the case of OpenShift, you can install Prometheus into the `default` namespace using *Operator Hub* and searching for "prometheus" and choosing the Red Hat supported version of the Operator. If your cluster has https://docs.openshift.com/container-platform/4.12/monitoring/enabling-monitoring-for-user-defined-projects.html[monitoring enabled for user-defined projects] this step might be unnecessary.
+In the case of OpenShift, you can install Prometheus into the target namespace using *Operator Hub* and searching for "prometheus" and choosing the Red Hat supported version of the Operator. If your cluster has https://docs.openshift.com/container-platform/4.12/monitoring/enabling-monitoring-for-user-defined-projects.html[monitoring enabled for user-defined projects] this step might be unnecessary.
 
 === Deploying the Demo Components
 
@@ -54,9 +54,9 @@ following commands to view EDA Pod logs:
 
 [source, bash]
 ----
-export EDA_POD=$(oc get pod -l 'app.kubernetes.io/name=ansible-eda' -n default -o jsonpath='{.items[0].metadata.name}')
+export EDA_POD=$(oc get pod -l 'app.kubernetes.io/name=ansible-eda' -o jsonpath='{.items[0].metadata.name}')
 
-oc logs $EDA_POD -n default -f
+oc logs $EDA_POD -f
 ----
 
 == Demo Flow
@@ -70,7 +70,7 @@ You can view these alerts in the Prometheus UI. Obtain the Prometheus Route deta
 
 [source, bash]
 ----
-oc get route prometheus -n default -o jsonpath='{.spec.host}'
+oc get route prometheus -o jsonpath='{.spec.host}'
 ----
 
 Visit the hostname provided by the previous command in your browser. It should look similar to this:
@@ -81,14 +81,14 @@ The `InstanceDown` alert can be triggered by scaling the Quarkus deployment down
 
 [source, bash]
 ----
-oc scale --replicas=1 deployment/quarkus-monitor -n default
+oc scale --replicas=1 deployment/quarkus-monitor
 ----
 
 The `MemoryUsage` alert can be triggered by making sure the sum of the `current_memory` metric reported by the Quarkus Pods exceeds the threshold defined in _5-prometheus.yaml_ for more than two minutes. Increase the `current_memory` value 
 
 [source, bash]
 ----
-export QUARKUS_ROUTE=$(oc get route quarkus-monitor -n default -o jsonpath='http://{.spec.host}')
+export QUARKUS_ROUTE=$(oc get route quarkus-monitor -o jsonpath='http://{.spec.host}')
 
 curl $QUARKUS_ROUTE/hello/consume/50
 ----
